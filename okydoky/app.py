@@ -3,6 +3,7 @@
 
 """
 import base64
+import datetime
 import functools
 import logging
 import os
@@ -25,6 +26,7 @@ from werkzeug.urls import url_decode, url_encode
 
 REQUIRED_CONFIGS = ('REPOSITORY', 'CLIENT_ID', 'CLIENT_SECRET',
                     'SAVE_DIRECTORY', 'SECRET_KEY')
+EXPIRES = datetime.timedelta(minutes=5)
 
 app = Flask(__name__)
 
@@ -82,18 +84,58 @@ def home():
 @app.route('/<ref>/', defaults={'path': 'index.html'})
 @app.route('/<ref>/<path:path>')
 def docs(ref, path):
+    logger = logging.getLogger(__name__ + '.docs')
     if not re.match(r'^[A-Fa-f0-9]{7,40}$', ref):
         abort(404)
     save_dir = current_app.config['SAVE_DIRECTORY']
-    if not session.get('login'):
+    try:
+        login = session['login']
+    except KeyError:
+        session.pop('access', None)
         back = base64.urlsafe_b64encode(request.url)
         params = {
             'client_id': current_app.config['CLIENT_ID'],
             'redirect_uri': url_for('auth', back=back, _external=True),
-            'scope': ''
+            'scope': 'repo'
         }
         return redirect('https://github.com/login/oauth/authorize?' +
                         url_encode(params))
+    logger.debug('login = %r', login)
+    try:
+        auth, ltime = session['access']
+    except (KeyError, ValueError):
+        auth = False
+        ltime = None
+    if ltime is None or ltime < datetime.datetime.utcnow() - EXPIRES:
+        repo_name = current_app.config['REPOSITORY']
+        # user repos
+        response = urllib2.urlopen(
+            'https://api.github.com/user/repos?access_token=' +
+            login
+        )
+        repo_dicts = json.load(response)
+        response.close()
+        repos = frozenset(repo['full_name'] for repo in repo_dicts)
+        logger.debug('repos = %r', repos)
+        auth = repo_name in repos
+        # org repos
+        if not auth:
+            url = 'https://api.github.com/orgs/{0}/repos?access_token={1}'
+            try:
+                response = urllib2.urlopen(
+                    url.format(repo_name.split('/', 1)[0], login)
+                )
+            except IOError:
+                auth = False
+            else:
+                repo_dicts = json.load(response)
+                response.close()
+                org_repos = frozenset(repo['full_name'] for repo in repo_dicts)
+                logger.debug('org_repos = %r', org_repos)
+                auth = repo_name in org_repos
+        session['access'] = auth, datetime.datetime.utcnow()
+    if not auth:
+        abort(403)
     if len(ref) < 40:
         for candi in os.listdir(save_dir):
             if (os.path.isdir(os.path.join(save_dir, candi)) and

@@ -115,6 +115,17 @@ __ https://github.com/crosspop/okydoky
 Changelog
 ---------
 
+Version 0.9.2
+'''''''''''''
+
+To be released.
+
+- Fixed a security bug: now users must have an authorization for the repository.
+  [`#4`_]
+
+.. _#4: https://github.com/crosspop/okydoky/issues/4
+
+
 Version 0.9.1
 '''''''''''''
 
