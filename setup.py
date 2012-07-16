@@ -25,7 +25,8 @@ setup(
         '': ['README.rst', 'requirements.txt', 'distribute_setup.py']
     },
     version=VERSION,
-    description='Automated docs builder using Sphinx/GitHub/Distribute',
+    description='Automated docs builder using Sphinx/GitHub/Distribute for '
+                'private use',
     long_description=readme,
     license='MIT License',
     author='Hong Minhee',
