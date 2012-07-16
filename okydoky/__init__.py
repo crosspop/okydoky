@@ -2,11 +2,15 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
+import functools
+import logging
 import os.path
 
+from eventlet import spawn_n
 from eventlet.green import urllib2
-from flask import (Flask, current_app, redirect, request, render_template,
-                   url_for)
+from eventlet.greenpool import GreenPool
+from flask import (Flask, current_app, json, make_response, redirect, request,
+                   render_template, url_for)
 from werkzeug.urls import url_decode, url_encode
 
 
@@ -22,7 +26,7 @@ def open_file(filename, mode='r', config=None):
 
 
 def open_token_file(mode='r', config=None):
-    return open_file('token.txt', mode)
+    return open_file('token.txt', mode, config=config)
 
 
 def get_token(config=None):
@@ -40,7 +44,7 @@ def get_token(config=None):
 
 
 def open_head_file(mode='r', config=None):
-    return open_file('head.txt', mode)
+    return open_file('head.txt', mode, config=config)
 
 
 def get_head(config=None):
@@ -94,3 +98,53 @@ def auth():
         f.write(token)
     current_app.config['ACCESS_TOKEN'] = token
     return redirect(url_for('home'))
+
+
+@app.route('/', methods=['POST'])
+def post_receive_hook():
+    payload = json.loads(request.form['payload'])
+    commits = [commit['id'] for commit in payload['commits']]
+    spawn_n(build_main, commits, dict(current_app.config))
+    response = make_response('true', 202)
+    response.mimetype = 'application/json'
+    return response
+
+
+def build_main(commits, config):
+    logger = logging.getLogger(__name__ + '.build_main')
+    logger.info('triggered with %d commits', len(commits))
+    logger.debug('commits = %r', commits)
+    token = get_token(config)
+    pool = GreenPool()
+    results = pool.imap(
+        functools.partial(download_archive, token=token, config=config),
+        commits[::-1]
+    )
+    files = dict(results)
+    logger.debug('files = %r', files)
+
+
+def download_archive(commit, token, config):
+    logger = logging.getLogger(__name__ + '.download_archive')
+    logger.info('start downloading archive %s', commit)
+    url_p = 'https://api.github.com/repos/{0}/tarball/{1}?access_token={2}'
+    url = url_p.format(config['REPOSITORY'], commit, token)
+    while 1:
+        response = urllib2.urlopen(url)
+        try:
+            url = response.info()['Location']
+        except KeyError:
+            break
+    filename = os.path.join(config['SAVE_DIRECTORY'], commit + '.tar.gz')
+    logger.debug('save %s into %s', commit, filename)
+    logger.debug('filesize of %s: %s',
+                 filename, response.info()['Content-Length'])
+    with open(filename, 'wb') as f:
+        while 1:
+            chunk = response.read(4096)
+            if chunk:
+                f.write(chunk)
+                continue
+            break
+    logger.info('finish downloading archive %s: %s', commit, filename)
+    return commit, filename
