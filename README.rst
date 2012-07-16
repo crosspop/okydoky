@@ -24,7 +24,7 @@ It works in the following instructions:
 1. When new commits are pushed, GitHub triggers Okydoky `post-receive hook`__.
 2. Okydoky downloads `tarball archives`__ of pushed commits from GitHub.
 3. Tarball archive gets extracted into a temporary directory.
-4. Sphinx build the documentation.
+4. Sphinx builds the documentation.
 5. When users request the docs using their web browser,
    Okydoky asks the user to authenticate using GitHub OAuth.
 6. If they has the authorization, Okydoky serves a built docs.
