@@ -1,3 +1,5 @@
 *.pyc
 .*.swp
+dist
+*.egg
 Okydoky.egg-info
