@@ -110,3 +110,22 @@ Check out::
 __ http://dahlia.kr/
 __ http://minhee.mit-license.org/
 __ https://github.com/crosspop/okydoky
+
+
+Changelog
+---------
+
+Version 0.9.1
+'''''''''''''
+
+Released on July 17, 2012.  Hotfix of 0.9.0.
+
+- Made ``okydoky`` package empty and moved things to ``okydoky.app`` module.
+
+
+Version 0.9.0
+'''''''''''''
+
+Released on July 17, 2012.
+
+- Initial version.
