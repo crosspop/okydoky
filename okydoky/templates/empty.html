@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block body %}
+  <p>Add a <a href="https://help.github.com/articles/post-receive-hooks"
+     >post-receive hook</a> to the <a href="https://github.com/
+     {{- config.REPOSITORY }}"><tt>{{ config.REPOSITORY }}</tt></a>
+     repository:</p>
+  <p><a href="{{ hook_url }}"><tt>{{ hook_url }}</tt></a></p>
+  {% if config.DEBUG %}
+    <h2>Debug: make a <tt>POST</tt> hook request</h2>
+    <form action="{{ hook_url }}" method="post" class="debug">
+      <textarea name="payload" cols="60" rows="5">{
+  "commits": [
+    {"id": "ffffffffffffffffffffffffffffffffffffffff"},
+    {"id": "0000000000000000000000000000000000000000"}
+  ]
+}</textarea>
+      <button type="submit"><tt>POST</tt></button>
+    </form>
+  {% endif %}
+{% endblock %}
