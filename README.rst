@@ -118,7 +118,7 @@ Changelog
 Version 0.9.2
 '''''''''''''
 
-To be released.
+Released on July 17, 2012.  Hotfix of 0.9.1.
 
 - Fixed a security bug: now users must have an authorization for the repository.
   [`#4`_]
