@@ -4,7 +4,11 @@
 """
 import functools
 import logging
+import os
 import os.path
+import shutil
+import subprocess
+import sys
 import tarfile
 
 from eventlet import spawn_n
@@ -12,6 +16,7 @@ from eventlet.green import urllib2
 from eventlet.greenpool import GreenPool
 from flask import (Flask, current_app, json, make_response, redirect, request,
                    render_template, url_for)
+from virtualenv import create_environment
 from werkzeug.urls import url_decode, url_encode
 
 
@@ -121,8 +126,16 @@ def build_main(commits, config):
         functools.partial(download_archive, token=token, config=config),
         commits
     )
+    env = make_virtualenv(config)
+    save_dir = config['SAVE_DIRECTORY']
     for commit, filename in results:
-        extract(filename, config['SAVE_DIRECTORY'])
+        working_dir = extract(filename, save_dir)
+        build = build_sphinx(working_dir, env)
+        result_dir = os.path.join(save_dir, commit)
+        shutil.move(build, result_dir)
+        logger.info('build complete: %s' % result_dir)
+        shutil.rmtree(working_dir)
+        logger.info('working directory %s has removed' % working_dir)
 
 
 def download_archive(commit, token, config):
@@ -163,3 +176,38 @@ def extract(filename, path):
     os.unlink(filename)
     logger.info('%s has removed', filename)
     return result_path
+
+
+def build_sphinx(path, env):
+    logger = logging.getLogger(__name__ + '.build_sphinx')
+    def run(cmd, **kwargs):
+        logger.debug(' '.join(map(repr, cmd)))
+        subprocess.call(cmd, **kwargs)
+    if sys.platform == 'win32':
+        bindir = os.path.join(env, 'Scripts')
+    else:
+        bindir = os.path.join(env, 'bin')
+    python = os.path.join(bindir, 'python')
+    logger.info('installing dependencies...')
+    run([python, 'setup.py', 'develop'], cwd=path)
+    logger.info('installing Sphinx...')
+    run([os.path.join(bindir, 'easy_install'), 'Sphinx'])
+    logger.info('building documentation using Sphinx...')
+    run([python, 'setup.py', 'build_sphinx'], cwd=path)
+    run([python, 'setup.py', 'develop', '--uninstall'], cwd=path)
+    build = os.path.join(path, 'build', 'sphinx', 'html')
+    logger.info('documentation: %s' % build)
+    return build
+
+
+def make_virtualenv(config):
+    logger = logging.getLogger(__name__ + '.make_virtualenv')
+    save_dir = config['SAVE_DIRECTORY']
+    envdir = os.path.join(save_dir, '_env')
+    if os.path.isdir(envdir):
+        logger.info('virtualenv already exists: %s; skip...' % envdir)
+        return envdir
+    logger.info('creating new virtualenv: %s' % envdir)
+    create_environment(envdir, use_distribute=True)
+    logger.info('created virtualenv: %s' % envdir)
+    return envdir
