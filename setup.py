@@ -7,6 +7,8 @@ except ImportError:
     use_setuptools()
     from setuptools import setup
 
+from okydoky.version import VERSION
+
 
 with open('README.rst') as f:
     readme = f.read()
@@ -22,7 +24,7 @@ setup(
         'okydoky': ['templates/*.*'],
         '': ['README.rst', 'requirements.txt', 'distribute_setup.py']
     },
-    version='0.9.0',
+    version=VERSION,
     description='Automated docs builder using Sphinx/GitHub/Distribute',
     long_description=readme,
     license='MIT License',
