@@ -1,25 +1,9 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Okydoky</title>
-    <style>
-    body { background-color: #efefef; padding: 0; margin: 0; }
-    div { width: 500px; margin: auto; padding: 1em; background-color: white;
-          font-family: sans-serif; }
-    h1 { margin-top: 0; }
-    a { text-decoration: none; }
-    </style>
-  </head>
-  <body>
-    <div>
-      <h1>Okydoky</h1>
-      <p>Okydoky requires an authorization to access the GitHub repository
-         <a href="https://github.com/{{ config.REPOSITORY }}"><tt>
-         {{- config.REPOSITORY }}</tt></a>.</p>
-      <form method="get" action="{{ login_url }}">
-        <button type="submit">Login with GitHub</button>
-      </form>
-    </div>
-  </body>
-</html>
+{% extends 'base.html' %}
+{% block body %}
+  <p>Okydoky requires an authorization to access the GitHub repository
+     <a href="https://github.com/{{ config.REPOSITORY }}"><tt>
+     {{- config.REPOSITORY }}</tt></a>.</p>
+  <form method="get" action="{{ login_url }}">
+    <button type="submit">Login with GitHub</button>
+  </form>
+{% endblock %}
