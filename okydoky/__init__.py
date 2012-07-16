@@ -6,6 +6,7 @@ import functools
 import logging
 import os
 import os.path
+import re
 import shutil
 import subprocess
 import sys
@@ -14,8 +15,9 @@ import tarfile
 from eventlet import spawn_n
 from eventlet.green import urllib2
 from eventlet.greenpool import GreenPool
-from flask import (Flask, current_app, json, make_response, redirect, request,
-                   render_template, url_for)
+from flask import (Flask, abort, current_app, json, make_response, redirect,
+                   request, render_template, url_for)
+from flask.helpers import send_from_directory
 from virtualenv import create_environment
 from werkzeug.urls import url_decode, url_encode
 
@@ -70,7 +72,22 @@ def home():
     if head is None:
         hook_url = url_for('post_receive_hook', _external=True)
         return render_template('empty.html', hook_url=hook_url)
-    return token + '\n' + token
+    return redirect(url_for('docs', ref=head))
+
+
+@app.route('/<ref>/', defaults={'path': 'index.html'})
+@app.route('/<ref>/<path:path>')
+def docs(ref, path):
+    if not re.match(r'^[A-Fa-f0-9]{7,40}$', ref):
+        abort(404)
+    save_dir = current_app.config['SAVE_DIRECTORY']
+    if len(ref) < 40:
+        for candi in os.listdir(save_dir):
+            if (os.path.isdir(os.path.join(save_dir, candi)) and
+                candi.startswith(ref)):
+                return redirect(url_for('docs', ref=candi, path=path))
+        abort(404)
+    return send_from_directory(save_dir, os.path.join(ref, path))
 
 
 @app.route('/auth/1')
@@ -136,6 +153,9 @@ def build_main(commits, config):
         logger.info('build complete: %s' % result_dir)
         shutil.rmtree(working_dir)
         logger.info('working directory %s has removed' % working_dir)
+    with open_head_file('w', config=config) as f:
+        f.write(commits[0])
+    logger.info('new head: %s', commits[0])
 
 
 def download_archive(commit, token, config):
