@@ -35,6 +35,7 @@ setup(
     maintainer_email='dahlia' '@' 'crosspop.in',
     url='https://github.com/crosspop/okydoky',
     install_requires=requirements,
+    setup_requires=['github-distutils >= 0.1.1'],
     entry_points = {
         'console_scripts': [
             'okydoky = okydoky.run:main'
