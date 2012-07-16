@@ -33,3 +33,20 @@ It works in the following instructions:
 
 __ https://help.github.com/articles/post-receive-hooks
 __ http://developer.github.com/v3/repos/contents/#get-archive-link
+
+
+Configuration
+-------------
+
+``REPOSITORY``
+   The user and repository name e.g. ``'crosspop/okydoky'``.
+
+``CLIENT_ID``
+   The GitHub application's client key.
+
+``CLIENT_SECRET``
+   The GitHub application's secret key.
+
+``SAVE_DIRECTORY``
+   The path of the directory to store data.  This directory will store
+   some configured data, tarballs, and built documentations.
