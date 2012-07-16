@@ -38,6 +38,9 @@ __ http://developer.github.com/v3/repos/contents/#get-archive-link
 Configuration
 -------------
 
+The config file is a normal Python script.  It uses Flask's config system.
+Read `Flask's docs about config files`__.
+
 ``REPOSITORY``
    The user and repository name e.g. ``'crosspop/okydoky'``.
 
@@ -54,4 +57,5 @@ Configuration
 ``SECRET_KEY``
    The secret key to sign sessions.  See `Flask's docs about sessions`__ also.
 
+__ http://flask.readthedocs.org/en/latest/config/#configuring-from-files
 __ http://flask.readthedocs.org/en/latest/quickstart/#sessions

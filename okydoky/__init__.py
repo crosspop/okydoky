@@ -23,6 +23,9 @@ from virtualenv import create_environment
 from werkzeug.urls import url_decode, url_encode
 
 
+REQUIRED_CONFIGS = ('REPOSITORY', 'CLIENT_ID', 'CLIENT_SECRET',
+                    'SAVE_DIRECTORY', 'SECRET_KEY')
+
 app = Flask(__name__)
 
 
