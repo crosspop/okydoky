@@ -2,6 +2,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
+import base64
 import functools
 import logging
 import os
@@ -16,7 +17,7 @@ from eventlet import spawn_n
 from eventlet.green import urllib2
 from eventlet.greenpool import GreenPool
 from flask import (Flask, abort, current_app, json, make_response, redirect,
-                   request, render_template, url_for)
+                   request, render_template, session, url_for)
 from flask.helpers import send_from_directory
 from virtualenv import create_environment
 from werkzeug.urls import url_decode, url_encode
@@ -81,6 +82,15 @@ def docs(ref, path):
     if not re.match(r'^[A-Fa-f0-9]{7,40}$', ref):
         abort(404)
     save_dir = current_app.config['SAVE_DIRECTORY']
+    if not session.get('login'):
+        back = base64.urlsafe_b64encode(request.url)
+        params = {
+            'client_id': current_app.config['CLIENT_ID'],
+            'redirect_uri': url_for('auth', back=back, _external=True),
+            'scope': ''
+        }
+        return redirect('https://github.com/login/oauth/authorize?' +
+                        url_encode(params))
     if len(ref) < 40:
         for candi in os.listdir(save_dir):
             if (os.path.isdir(os.path.join(save_dir, candi)) and
@@ -90,7 +100,7 @@ def docs(ref, path):
     return send_from_directory(save_dir, os.path.join(ref, path))
 
 
-@app.route('/auth/1')
+@app.route('/auth')
 def auth_redirect():
     params = {
         'client_id': current_app.config['CLIENT_ID'],
@@ -101,12 +111,20 @@ def auth_redirect():
                     url_encode(params))
 
 
-@app.route('/auth/2')
+@app.route('/auth/finalize')
 def auth():
+    try:
+        back = request.args['back']
+    except KeyError:
+        redirect_uri = url_for('auth', _external=True)
+        initial = True
+    else:
+        redirect_uri = url_for('auth', back=back, _external=True)
+        initial = False
     params = {
         'client_id': current_app.config['CLIENT_ID'],
         'client_secret': current_app.config['CLIENT_SECRET'],
-        'redirect_uri': url_for('auth', _external=True),
+        'redirect_uri': redirect_uri,
         'code': request.args['code'],
         'state': request.args['state']
     }
@@ -117,10 +135,15 @@ def auth():
     auth_data = url_decode(response.read())
     response.close()
     token = auth_data['access_token']
-    with open_token_file('w') as f:
-        f.write(token)
-    current_app.config['ACCESS_TOKEN'] = token
-    return redirect(url_for('home'))
+    if initial:
+        with open_token_file('w') as f:
+            f.write(token)
+        current_app.config['ACCESS_TOKEN'] = token
+        return_url = url_for('home')
+    else:
+        return_url = base64.urlsafe_b64decode(str(back))
+    session['login'] = token
+    return redirect(return_url)
 
 
 @app.route('/', methods=['POST'])

@@ -50,3 +50,8 @@ Configuration
 ``SAVE_DIRECTORY``
    The path of the directory to store data.  This directory will store
    some configured data, tarballs, and built documentations.
+
+``SECRET_KEY``
+   The secret key to sign sessions.  See `Flask's docs about sessions`__ also.
+
+__ http://flask.readthedocs.org/en/latest/quickstart/#sessions
