@@ -11,7 +11,7 @@ import os.path
 from eventlet import listen
 from eventlet.wsgi import server
 
-from . import REQUIRED_CONFIGS, app
+from .app import REQUIRED_CONFIGS, app
 
 
 parser = optparse.OptionParser()
