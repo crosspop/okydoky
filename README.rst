@@ -9,6 +9,8 @@ to continuously build documentations, with the following assumptions:
 2. Project is packaged through setuptools_ (not pip_ nor any others).
 3. Source code is managed under GitHub.
 
+**To say shortly, it's simply a ReadTheDocs.org for private use.**
+
 .. _Sphinx: http://sphinx.pocoo.org/
 .. _GitHub: https://github.com/
 .. _Distribute: http://pypi.python.org/pypi/distribute
