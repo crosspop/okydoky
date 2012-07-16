@@ -5,6 +5,7 @@
 import functools
 import logging
 import os.path
+import tarfile
 
 from eventlet import spawn_n
 from eventlet.green import urllib2
@@ -118,10 +119,10 @@ def build_main(commits, config):
     pool = GreenPool()
     results = pool.imap(
         functools.partial(download_archive, token=token, config=config),
-        commits[::-1]
+        commits
     )
-    files = dict(results)
-    logger.debug('files = %r', files)
+    for commit, filename in results:
+        extract(filename, config['SAVE_DIRECTORY'])
 
 
 def download_archive(commit, token, config):
@@ -148,3 +149,17 @@ def download_archive(commit, token, config):
             break
     logger.info('finish downloading archive %s: %s', commit, filename)
     return commit, filename
+
+
+def extract(filename, path):
+    logger = logging.getLogger(__name__ + '.extract')
+    logger.info('extracting %s...', filename)
+    tar = tarfile.open(filename)
+    logger.debug('tar.getnames() = %r', tar.getnames())
+    dirname = tar.getnames()[0]
+    tar.extractall(path)
+    result_path = os.path.join(path, dirname)
+    logger.info('%s has extracted to %s', filename, result_path)
+    os.unlink(filename)
+    logger.info('%s has removed', filename)
+    return result_path
