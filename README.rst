@@ -49,7 +49,7 @@ It takes a `config file <config>`.
 Config files have to contain some required values like GitHub application
 key and secret key.
 
-You have to `create a GitHub application`__ to use Okydoky.  It's **Callback
+You have to `create a GitHub application`__ to use Okydoky.  Its **Callback
 URL** is very important.  Fill it with::
 
     http://<host>/auth/finalize
