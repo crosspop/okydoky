@@ -96,3 +96,17 @@ Read `Flask's docs about config files`__.
 
 __ http://flask.readthedocs.org/en/latest/config/#configuring-from-files
 __ http://flask.readthedocs.org/en/latest/quickstart/#sessions
+
+
+Open source
+-----------
+
+Okydoky is written by `Hong Minhee`__ for Crosspop.  It's distributed under
+`MIT license`__, and the source code can be found in the `GitHub repository`__.
+Check out::
+
+    $ git clone git://github.com/crosspop/okydoky.git
+
+__ http://dahlia.kr/
+__ http://minhee.mit-license.org/
+__ https://github.com/crosspop/okydoky
