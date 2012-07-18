@@ -150,7 +150,7 @@ Changelog
 Version 0.9.3
 '''''''''''''
 
-To be released.
+Released on July 18, 2012.
 
 - Now the index page shows the list of refs.
 - Now Okydoky sets ``OKYDOKY=1`` environment variable during its build
