@@ -86,7 +86,11 @@ def home():
 @app.route('/<ref>/<path:path>')
 def docs(ref, path):
     logger = logging.getLogger(__name__ + '.docs')
-    if not re.match(r'^[A-Fa-f0-9]{7,40}$', ref):
+    if ref == 'head':
+        ref = get_head()
+        if ref is None:
+            abort(404)
+    elif not re.match(r'^[A-Fa-f0-9]{7,40}$', ref):
         abort(404)
     save_dir = current_app.config['SAVE_DIRECTORY']
     try:

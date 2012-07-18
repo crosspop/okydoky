@@ -154,6 +154,7 @@ To be released.
 
 - Now Okydoky sets ``OKYDOKY=1`` environment variable during its build
   process.  [`#5`_]
+- Add ``/head`` special ref url.
 - Fixed a bug that the head is not set to the latest commit.
 
 .. _#5: https://github.com/crosspop/okydoky/issues/5
