@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% macro ref(ref) %}
+  <a href="{{ url_for('docs', ref=ref) }}"><strong>{{ ref }}</strong></a>
+  <br>
+  <time datetime="{{ refs[ref] }}">{{ refs[ref] }}</time>
+{% endmacro %}
+{% block body %}
+  <h2><tt>head</tt>: The latest version</h2>
+  <p>You can always access to the latest version using the following
+     special ref <tt>head</tt>:</p>
+  <p><a href="{{ url_for('docs', ref='head') }}"><tt>
+     {{- url_for('docs', ref='head', _external=True) }}</tt></a></p>
+  <p>The current latest version is:</p>
+  <p>{{ ref(head) }}</p>
+  <h2>The older versions</h2>
+  <ul>
+    {% for refname, time in refs|dictsort(by='value')|reverse %}
+      <li>{{ ref(refname) }}</l>
+    {% endfor %}
+  </ul>
+{% endblock %}

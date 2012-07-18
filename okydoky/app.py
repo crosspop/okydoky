@@ -13,6 +13,7 @@ import shutil
 import subprocess
 import sys
 import tarfile
+import time
 
 from eventlet import spawn_n
 from eventlet.green import urllib2
@@ -128,11 +129,21 @@ def home():
     token = get_token()
     if token is None:
         return render_template('home.html', login_url=url_for('auth_redirect'))
+    redirect = ensure_login()
+    if redirect:
+        return redirect
     head = get_head()
     if head is None:
         hook_url = url_for('post_receive_hook', _external=True)
         return render_template('empty.html', hook_url=hook_url)
-    return redirect(url_for('docs', ref=head))
+    save_dir = current_app.config['SAVE_DIRECTORY']
+    refs = {}
+    time_fmt = '%Y-%m-%dT%H:%M:%SZ'
+    for name in os.listdir(save_dir):
+        if re.match(r'^[A-Fa-f0-9]{40}$', name):
+            stat = os.stat(os.path.join(save_dir, name))
+            refs[name] = time.strftime(time_fmt, time.gmtime(stat.st_mtime))
+    return render_template('list.html', head=head, refs=refs)
 
 
 @app.route('/<ref>/', defaults={'path': 'index.html'})
@@ -207,8 +218,7 @@ def auth():
 def post_receive_hook():
     payload = json.loads(request.form['payload'])
     commits = payload['commits']
-    commits.sort(key=lambda commit: parse_date(commit['timestamp']),
-                 reverse=True)
+    commits.sort(key=lambda commit: parse_date(commit['timestamp']))
     ids = [commit['id'] for commit in commits]
     spawn_n(build_main, ids, dict(current_app.config))
     response = make_response('true', 202)
@@ -236,9 +246,8 @@ def build_main(commits, config):
         logger.info('build complete: %s' % result_dir)
         shutil.rmtree(working_dir)
         logger.info('working directory %s has removed' % working_dir)
-        if commit == commits[0]:
-            with open_head_file('w', config=config) as f:
-                f.write(commit)
+        with open_head_file('w', config=config) as f:
+            f.write(commit)
     logger.info('new head: %s', commits[0])
 
 

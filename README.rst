@@ -152,6 +152,7 @@ Version 0.9.3
 
 To be released.
 
+- Now the index page shows the list of refs.
 - Now Okydoky sets ``OKYDOKY=1`` environment variable during its build
   process.  [`#5`_]
 - Add ``/head`` special ref url.
