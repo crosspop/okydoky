@@ -115,6 +115,14 @@ __ https://github.com/crosspop/okydoky
 Changelog
 ---------
 
+Version 0.9.3
+'''''''''''''
+
+To be released.
+
+- Fixed a bug that the head is not set to the latest commit.
+
+
 Version 0.9.2
 '''''''''''''
 

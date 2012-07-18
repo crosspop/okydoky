@@ -20,6 +20,7 @@ from eventlet.greenpool import GreenPool
 from flask import (Flask, abort, current_app, json, make_response, redirect,
                    request, render_template, session, url_for)
 from flask.helpers import send_from_directory
+from iso8601 import parse_date
 from virtualenv import create_environment
 from werkzeug.urls import url_decode, url_encode
 
@@ -194,8 +195,11 @@ def auth():
 @app.route('/', methods=['POST'])
 def post_receive_hook():
     payload = json.loads(request.form['payload'])
-    commits = [commit['id'] for commit in payload['commits']]
-    spawn_n(build_main, commits, dict(current_app.config))
+    commits = payload['commits']
+    commits.sort(key=lambda commit: parse_date(commit['timestamp']),
+                 reverse=True)
+    ids = [commit['id'] for commit in commits]
+    spawn_n(build_main, ids, dict(current_app.config))
     response = make_response('true', 202)
     response.mimetype = 'application/json'
     return response
@@ -221,8 +225,9 @@ def build_main(commits, config):
         logger.info('build complete: %s' % result_dir)
         shutil.rmtree(working_dir)
         logger.info('working directory %s has removed' % working_dir)
-    with open_head_file('w', config=config) as f:
-        f.write(commits[0])
+        if commit == commits[0]:
+            with open_head_file('w', config=config) as f:
+                f.write(commit)
     logger.info('new head: %s', commits[0])
 
 

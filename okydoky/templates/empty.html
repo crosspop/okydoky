@@ -10,8 +10,14 @@
     <form action="{{ hook_url }}" method="post" class="debug">
       <textarea name="payload" cols="60" rows="5">{
   "commits": [
-    {"id": "ffffffffffffffffffffffffffffffffffffffff"},
-    {"id": "0000000000000000000000000000000000000000"}
+    {
+      "id": "ffffffffffffffffffffffffffffffffffffffff",
+      "timestamp": "2008-02-15T14:36:34-08:00"
+    },
+    {
+      "id": "0000000000000000000000000000000000000000",
+      "timestamp": "2008-02-14T13:35:33-07:00"
+    }
   ]
 }</textarea>
       <button type="submit"><tt>POST</tt></button>
