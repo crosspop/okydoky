@@ -98,6 +98,38 @@ __ http://flask.readthedocs.org/en/latest/config/#configuring-from-files
 __ http://flask.readthedocs.org/en/latest/quickstart/#sessions
 
 
+Special environment variable: ``OKYDOKY``
+-----------------------------------------
+
+Okydoky sets the special environment variable named ``OKYDOKY`` during
+its build process.  You can determine whether it's built by Okydoky or not.
+
+For example, you can add some additional requirements only for Okydoky build
+in ``setup.py`` script::
+
+    import os
+    from setuptools import setup
+
+    install_requires = ['Flask', 'SQLAlchemy']
+
+    if os.environ.get('OKYDOKY'):
+        install_requires.extend(['Sphinx', 'sphinxcontrib-httpdomain'])
+
+    setup(
+        name='YourProject',
+        install_requires=install_requires
+    )
+
+Or ``conf.py`` for Sphinx::
+
+    import os
+
+    if os.environ.get('OKYDOKY'):
+        html_theme = 'nature'
+    else:
+        html_theme = 'default'
+
+
 Open source
 -----------
 
@@ -120,7 +152,11 @@ Version 0.9.3
 
 To be released.
 
+- Now Okydoky sets ``OKYDOKY=1`` environment variable during its build
+  process.  [`#5`_]
 - Fixed a bug that the head is not set to the latest commit.
+
+.. _#5: https://github.com/crosspop/okydoky/issues/5
 
 
 Version 0.9.2

@@ -281,15 +281,17 @@ def build_sphinx(path, env):
     else:
         bindir = os.path.join(env, 'bin')
     python = os.path.join(bindir, 'python')
+    env = os.environ.copy()
+    env['OKYDOKY'] = '1'
     logger.info('installing dependencies...')
-    run([python, 'setup.py', 'develop'], cwd=path)
+    run([python, 'setup.py', 'develop'], cwd=path, env=env)
     logger.info('installing Sphinx...')
     run([os.path.join(bindir, 'easy_install'), 'Sphinx'])
     logger.info('building documentation using Sphinx...')
-    run([python, 'setup.py', 'build_sphinx'], cwd=path)
+    run([python, 'setup.py', 'build_sphinx'], cwd=path, env=env)
     run([python, 'setup.py', 'develop', '--uninstall'], cwd=path)
     build = os.path.join(path, 'build', 'sphinx', 'html')
-    logger.info('documentation: %s' % build)
+    logger.info('documentation: %s', build)
     return build
 
 
