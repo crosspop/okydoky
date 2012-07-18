@@ -70,29 +70,8 @@ def get_head(config=None):
         pass
 
 
-@app.route('/')
-def home():
-    token = get_token()
-    if token is None:
-        return render_template('home.html', login_url=url_for('auth_redirect'))
-    head = get_head()
-    if head is None:
-        hook_url = url_for('post_receive_hook', _external=True)
-        return render_template('empty.html', hook_url=hook_url)
-    return redirect(url_for('docs', ref=head))
-
-
-@app.route('/<ref>/', defaults={'path': 'index.html'})
-@app.route('/<ref>/<path:path>')
-def docs(ref, path):
-    logger = logging.getLogger(__name__ + '.docs')
-    if ref == 'head':
-        ref = get_head()
-        if ref is None:
-            abort(404)
-    elif not re.match(r'^[A-Fa-f0-9]{7,40}$', ref):
-        abort(404)
-    save_dir = current_app.config['SAVE_DIRECTORY']
+def ensure_login():
+    logger = logging.getLogger(__name__ + '.ensure_login')
     try:
         login = session['login']
     except KeyError:
@@ -141,6 +120,34 @@ def docs(ref, path):
         session['access'] = auth, datetime.datetime.utcnow()
     if not auth:
         abort(403)
+    logger.debug('auth = %r', auth)
+
+
+@app.route('/')
+def home():
+    token = get_token()
+    if token is None:
+        return render_template('home.html', login_url=url_for('auth_redirect'))
+    head = get_head()
+    if head is None:
+        hook_url = url_for('post_receive_hook', _external=True)
+        return render_template('empty.html', hook_url=hook_url)
+    return redirect(url_for('docs', ref=head))
+
+
+@app.route('/<ref>/', defaults={'path': 'index.html'})
+@app.route('/<ref>/<path:path>')
+def docs(ref, path):
+    if ref == 'head':
+        ref = get_head()
+        if ref is None:
+            abort(404)
+    elif not re.match(r'^[A-Fa-f0-9]{7,40}$', ref):
+        abort(404)
+    redirect = ensure_login()
+    if redirect:
+        return redirect
+    save_dir = current_app.config['SAVE_DIRECTORY']
     if len(ref) < 40:
         for candi in os.listdir(save_dir):
             if (os.path.isdir(os.path.join(save_dir, candi)) and
