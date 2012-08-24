@@ -304,7 +304,7 @@ def build_sphinx(path, env):
     env = os.environ.copy()
     env['OKYDOKY'] = '1'
     logger.info('installing dependencies...')
-    run([python, 'setup.py', 'develop'], cwd=path, env=env)
+    run([python, 'setup.py', 'develop', '--upgrade'], cwd=path, env=env)
     logger.info('installing Sphinx...')
     run([os.path.join(bindir, 'easy_install'), 'Sphinx'])
     logger.info('building documentation using Sphinx...')

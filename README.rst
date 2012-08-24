@@ -152,6 +152,9 @@ Version 0.9.4
 
 To be released.
 
+- Use ``--upgrade`` option for ``setup.py develop`` command.
+  This prevents version conflics of dependencies..
+
 
 Version 0.9.3
 '''''''''''''
