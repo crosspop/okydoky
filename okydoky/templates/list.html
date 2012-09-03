@@ -15,7 +15,7 @@
   <h2>The older versions</h2>
   <ul>
     {% for refname, time in refs|dictsort(by='value')|reverse %}
-      <li>{{ ref(refname) }}</l>
+      <li>{{ ref(refname) }}</li>
     {% endfor %}
   </ul>
 {% endblock %}
