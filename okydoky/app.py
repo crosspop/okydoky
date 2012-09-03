@@ -304,15 +304,9 @@ def build_sphinx(path, env):
         command = ' '.join(map(repr, cmd))
         logger.debug(command)
         logs.append('$ ' + command)
-        kwargs.update(
-            stderr=subprocess.PIPE,
-            stdout=subprocess.STDOUT,
-            close_fds=True
-        )
-        pipe = subprocess.Popen(cmd, **kwargs)
-        logs.append(pipe.stdout.read())
-        pipe.stdin.close()
-        pipe.stdout.close()
+        result = subprocess.check_output(cmd, stderr=subprocess.STDOUT,
+                                         **kwargs)
+        logs.append(result)
     if sys.platform == 'win32':
         bindir = os.path.join(env, 'Scripts')
     else:
