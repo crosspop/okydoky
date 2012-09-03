@@ -150,7 +150,7 @@ Changelog
 Version 0.9.4
 '''''''''''''
 
-To be released.
+Released on September 3, 2012.
 
 - Use ``--upgrade`` option for ``setup.py develop`` command.
   This prevents version conflicts of dependencies.
