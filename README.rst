@@ -38,9 +38,11 @@ __ http://developer.github.com/v3/repos/contents/#get-archive-link
 How to use
 ----------
 
-It's an ordinary Python package.  You can install it using ``easy_install``::
+It's an ordinary Python package.  You can install it using ``easy_install``:
 
-    $ easy_install Okydoky
+.. code-block:: console
+
+   $ easy_install Okydoky
 
 This package provides a command line script called ``okydoky``.
 It's a web application and also a small web server for itself.
@@ -59,9 +61,11 @@ and replaces ``<host>`` with the domain name what you'll use.  And then,
 
     http://<host>/
 
-If you make a config file, then run an Okydoky server using ``okydoky`` script::
+If you make a config file, then run an Okydoky server using ``okydoky`` script:
 
-    $ okydoky -H 0.0.0.0 -p 8080 yourconfig.py
+.. code-block:: console
+
+   $ okydoky -H 0.0.0.0 -p 8080 yourconfig.py
 
 Lastly, you have to make an initial auth to finish installation.
 Open ``http://<host>/`` in your web browser and login with GitHub from there.
@@ -122,7 +126,7 @@ in ``setup.py`` script:
        install_requires=install_requires
    )
 
-Or ``conf.py`` for Sphinx::
+Or ``conf.py`` for Sphinx:
 
 .. code-block:: python
 
