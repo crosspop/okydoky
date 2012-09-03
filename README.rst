@@ -105,29 +105,33 @@ Okydoky sets the special environment variable named ``OKYDOKY`` during
 its build process.  You can determine whether it's built by Okydoky or not.
 
 For example, you can add some additional requirements only for Okydoky build
-in ``setup.py`` script::
+in ``setup.py`` script:
 
-    import os
-    from setuptools import setup
+.. code-block:: python
 
-    install_requires = ['Flask', 'SQLAlchemy']
+   import os
+   from setuptools import setup
 
-    if os.environ.get('OKYDOKY'):
-        install_requires.extend(['Sphinx', 'sphinxcontrib-httpdomain'])
+   install_requires = ['Flask', 'SQLAlchemy']
 
-    setup(
-        name='YourProject',
-        install_requires=install_requires
-    )
+   if os.environ.get('OKYDOKY'):
+       install_requires.extend(['Sphinx', 'sphinxcontrib-httpdomain'])
+
+   setup(
+       name='YourProject',
+       install_requires=install_requires
+   )
 
 Or ``conf.py`` for Sphinx::
 
-    import os
+.. code-block:: python
 
-    if os.environ.get('OKYDOKY'):
-        html_theme = 'nature'
-    else:
-        html_theme = 'default'
+   import os
+
+   if os.environ.get('OKYDOKY'):
+       html_theme = 'nature'
+   else:
+       html_theme = 'default'
 
 
 Open source
@@ -135,9 +139,11 @@ Open source
 
 Okydoky is written by `Hong Minhee`__ for Crosspop.  It's distributed under
 `MIT license`__, and the source code can be found in the `GitHub repository`__.
-Check out::
+Check out:
 
-    $ git clone git://github.com/crosspop/okydoky.git
+.. code-block:: console
+
+   $ git clone git://github.com/crosspop/okydoky.git
 
 __ http://dahlia.kr/
 __ http://minhee.mit-license.org/
