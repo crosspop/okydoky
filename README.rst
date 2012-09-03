@@ -154,6 +154,7 @@ To be released.
 
 - Use ``--upgrade`` option for ``setup.py develop`` command.
   This prevents version conflicts of dependencies.
+- Build logs are left in the ``build.txt`` file.
 
 
 Version 0.9.3

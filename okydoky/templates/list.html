@@ -15,7 +15,11 @@
   <h2>The older versions</h2>
   <ul>
     {% for refname, time in refs|dictsort(by='value')|reverse %}
-      <li>{{ ref(refname) }}</li>
+      <li>{{ ref(refname) }}
+          {% if build_logs[refname] %}
+            <a href="{{ url_for('docs', ref=refname) }}/build.txt"
+               class="build-log">Log</a>
+          {% endif %}</li>
     {% endfor %}
   </ul>
 {% endblock %}

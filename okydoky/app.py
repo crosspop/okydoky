@@ -139,11 +139,17 @@ def home():
     save_dir = current_app.config['SAVE_DIRECTORY']
     refs = {}
     time_fmt = '%Y-%m-%dT%H:%M:%SZ'
+    build_logs = {}
     for name in os.listdir(save_dir):
         if re.match(r'^[A-Fa-f0-9]{40}$', name):
-            stat = os.stat(os.path.join(save_dir, name))
+            fullname = os.path.join(save_dir, name)
+            stat = os.stat(fullname)
             refs[name] = time.strftime(time_fmt, time.gmtime(stat.st_mtime))
-    return render_template('list.html', head=head, refs=refs)
+            build_logs[name] = os.path.isfile(
+                os.path.join(fullname, 'build.txt')
+            )
+    return render_template('list.html',
+                           head=head, refs=refs, build_logs=build_logs)
 
 
 @app.route('/<ref>/', defaults={'path': 'index.html'})
@@ -293,9 +299,13 @@ def extract(filename, path):
 
 def build_sphinx(path, env):
     logger = logging.getLogger(__name__ + '.build_sphinx')
+    logs = []
     def run(cmd, **kwargs):
-        logger.debug(' '.join(map(repr, cmd)))
-        subprocess.call(cmd, **kwargs)
+        command = ' '.join(map(repr, cmd))
+        logger.debug(command)
+        logs.append('$ ' + command)
+        result = subprocess.call(cmd, **kwargs)
+        logs.append(result)
     if sys.platform == 'win32':
         bindir = os.path.join(env, 'Scripts')
     else:
@@ -311,6 +321,9 @@ def build_sphinx(path, env):
     run([python, 'setup.py', 'build_sphinx'], cwd=path, env=env)
     run([python, 'setup.py', 'develop', '--uninstall'], cwd=path)
     build = os.path.join(path, 'build', 'sphinx', 'html')
+    with open(os.path.join(build, 'build.txt')) as log_file:
+        for log_line in logs:
+            print >> log_file, log_line
     logger.info('documentation: %s', build)
     return build
 
