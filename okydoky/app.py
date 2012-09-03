@@ -321,7 +321,7 @@ def build_sphinx(path, env):
     run([python, 'setup.py', 'build_sphinx'], cwd=path, env=env)
     run([python, 'setup.py', 'develop', '--uninstall'], cwd=path)
     build = os.path.join(path, 'build', 'sphinx', 'html')
-    with open(os.path.join(build, 'build.txt')) as log_file:
+    with open(os.path.join(build, 'build.txt'), 'w') as log_file:
         for log_line in logs:
             print >> log_file, log_line
     logger.info('documentation: %s', build)
