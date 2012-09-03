@@ -17,7 +17,7 @@
     {% for refname, time in refs|dictsort(by='value')|reverse %}
       <li>{{ ref(refname) }}
           {% if build_logs[refname] %}
-            <a href="{{ url_for('docs', ref=refname) }}/build.txt"
+            <a href="{{ url_for('docs', ref=refname) }}build.txt"
                class="build-log">Log</a>
           {% endif %}</li>
     {% endfor %}
