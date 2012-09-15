@@ -5,6 +5,8 @@
 import base64
 import datetime
 import functools
+import hashlib
+import hmac
 import logging
 import os
 import os.path
@@ -174,12 +176,17 @@ def docs(ref, path):
     return send_from_directory(save_dir, os.path.join(ref, path))
 
 
+def get_oauth_state():
+    return hmac.new(current_app.secret_key, request.remote_addr, hashlib.sha1)
+
+
 @app.route('/auth')
 def auth_redirect():
     params = {
         'client_id': current_app.config['CLIENT_ID'],
         'redirect_uri': url_for('auth', _external=True),
-        'scope': 'repo'
+        'scope': 'repo',
+        'state': get_oauth_state()
     }
     return redirect('https://github.com/login/oauth/authorize?' +
                     url_encode(params))
@@ -200,7 +207,7 @@ def auth():
         'client_secret': current_app.config['CLIENT_SECRET'],
         'redirect_uri': redirect_uri,
         'code': request.args['code'],
-        'state': request.args['state']
+        'state': get_oauth_state()
     }
     response = urllib2.urlopen(
         'https://github.com/login/oauth/access_token',

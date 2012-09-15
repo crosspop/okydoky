@@ -157,6 +157,14 @@ __ https://github.com/crosspop/okydoky
 Changelog
 ---------
 
+Version 0.9.5
+'''''''''''''
+
+Released on September 16, 2012.
+
+- GitHub froced ``state`` for OAuth.  Follow that.
+
+
 Version 0.9.4
 '''''''''''''
 
