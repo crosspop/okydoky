@@ -341,8 +341,11 @@ def make_virtualenv(config):
     save_dir = config['SAVE_DIRECTORY']
     envdir = os.path.join(save_dir, '_env')
     if os.path.isdir(envdir):
-        logger.info('virtualenv already exists: %s; skip...' % envdir)
-        return envdir
+        if not config.get('RECREATE_VIRTUALENV'):
+            logger.info('virtualenv already exists: %s; skip...' % envdir)
+            return envdir
+        logger.info('virtualenv already exists: %s; remove...' % envdir)
+        shutil.rmtree(envdir)
     logger.info('creating new virtualenv: %s' % envdir)
     create_environment(envdir, use_distribute=True)
     logger.info('created virtualenv: %s' % envdir)

@@ -98,6 +98,14 @@ Read `Flask's docs about config files`__.
 ``SECRET_KEY``
    The secret key to sign sessions.  See `Flask's docs about sessions`__ also.
 
+``RECREATE_VIRTUALENV``
+   Creates the new virtualenv for every build.  It's a lot slower than
+   not using this, but instead makes free from side effects related
+   ``site-packages``.
+
+   Set any nonzero value e.g. ``1``, ``True`` if you want to
+   recreate the virtualenv everytime.
+
 __ http://flask.readthedocs.org/en/latest/config/#configuring-from-files
 __ http://flask.readthedocs.org/en/latest/quickstart/#sessions
 
@@ -156,6 +164,14 @@ __ https://github.com/crosspop/okydoky
 
 Changelog
 ---------
+
+Version 0.9.6
+'''''''''''''
+
+To be released.
+
+- Added ``RECREATE_VIRTUALENV`` option which makes it to create
+  the virtualenv for each build.
 
 Version 0.9.5
 '''''''''''''
