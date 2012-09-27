@@ -232,7 +232,8 @@ def post_receive_hook():
     payload = json.loads(request.form['payload'])
     commits = payload['commits']
     commits.sort(key=lambda commit: parse_date(commit['timestamp']))
-    ids = [commit['id'] for commit in commits]
+    ids = [(commit['id'], url_for('docs', ref=commit['id'], _external=True))
+           for commit in commits]
     spawn_n(build_main, ids, dict(current_app.config))
     response = make_response('true', 202)
     response.mimetype = 'application/json'
@@ -245,18 +246,28 @@ def build_main(commits, config):
     logger.debug('commits = %r', commits)
     token = get_token(config)
     pool = GreenPool()
+    commit_map = dict(commits)
+    commit_ids = [commit_id for commit_id, _ in commits]
     results = pool.imap(
         functools.partial(download_archive, token=token, config=config),
-        commits
+        commit_ids
     )
     env = make_virtualenv(config)
     save_dir = config['SAVE_DIRECTORY']
+    complete_hook = config.get('COMPLETE_HOOK')
     for commit, filename in results:
         working_dir = extract(filename, save_dir)
-        build = build_sphinx(working_dir, env)
+        try:
+            build = build_sphinx(working_dir, env)
+        except Exception:
+            if callable(complete_hook):
+                complete_hook(commit, commit_map[commit], sys.exc_info())
+            continue
         result_dir = os.path.join(save_dir, commit)
         shutil.move(build, result_dir)
         logger.info('build complete: %s' % result_dir)
+        if callable(complete_hook):
+            complete_hook(commit, commit_map[commit], None)
         shutil.rmtree(working_dir)
         logger.info('working directory %s has removed' % working_dir)
         with open_head_file('w', config=config) as f:

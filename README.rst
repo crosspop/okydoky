@@ -106,6 +106,30 @@ Read `Flask's docs about config files`__.
    Set any nonzero value e.g. ``1``, ``True`` if you want to
    recreate the virtualenv everytime.
 
+``COMPLETE_HOOK``
+   The callback function (any callable object) which is called when
+   the build has complete.  It's called for each commit, even if it
+   failed.
+
+   It takes three positional parameters:
+
+   1. (``basestring``) Commit hash
+   2. (``basestring``) Permalink of the docs.  It might be 404
+      if the build failed.
+   3. (``tuple``) Triple ``sys.exc_info()`` function returns
+      if the build failed.  ``None`` if the build succeeded.
+
+   You can utilize the last argument for printing the error traceback
+   e.g.:
+
+   .. code-block:: python
+
+      import traceback
+
+      def COMPLETE_HOOK(commit_id, permalink, exc_info):
+          if exc_info is not None:
+              traceback.print_exception(*exc_info)
+
 __ http://flask.readthedocs.org/en/latest/config/#configuring-from-files
 __ http://flask.readthedocs.org/en/latest/quickstart/#sessions
 
@@ -172,6 +196,7 @@ To be released.
 
 - Added ``RECREATE_VIRTUALENV`` option which makes it to create
   the virtualenv for each build.
+- Added ``COMPLETE_HOOK`` option.
 
 Version 0.9.5
 '''''''''''''
