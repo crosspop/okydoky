@@ -199,6 +199,7 @@ To be released.
 - Added ``RECREATE_VIRTUALENV`` option which makes it to create
   the virtualenv for each build.
 - Added ``COMPLETE_HOOK`` option.
+- Try recreating the virtualenv if the build has failed first.
 
 Version 0.9.5
 '''''''''''''

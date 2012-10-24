@@ -260,8 +260,17 @@ def build_main(commits, config):
         try:
             build = build_sphinx(working_dir, env)
         except Exception:
+            permalink = commit_map[commit]
+            if not config.get('RECREATE_VIRTUALENV'):
+                env = make_virtualenv(config, recreate=True)
+                try:
+                    build = build_sphinx(working_dir, env)
+                except Exception:
+                    if callable(complete_hook):
+                        complete_hook(commit, permalink, sys.exc_info())
+                    continue
             if callable(complete_hook):
-                complete_hook(commit, commit_map[commit], sys.exc_info())
+                complete_hook(commit, permalink, sys.exc_info())
             continue
         result_dir = os.path.join(save_dir, commit)
         shutil.move(build, result_dir)
@@ -347,12 +356,12 @@ def build_sphinx(path, env):
     return build
 
 
-def make_virtualenv(config):
+def make_virtualenv(config, recreate=False):
     logger = logging.getLogger(__name__ + '.make_virtualenv')
     save_dir = config['SAVE_DIRECTORY']
     envdir = os.path.join(save_dir, '_env')
     if os.path.isdir(envdir):
-        if not config.get('RECREATE_VIRTUALENV'):
+        if not config.get('RECREATE_VIRTUALENV', recreate):
             logger.info('virtualenv already exists: %s; skip...' % envdir)
             return envdir
         logger.info('virtualenv already exists: %s; remove...' % envdir)
