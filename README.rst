@@ -130,6 +130,8 @@ Read `Flask's docs about config files`__.
           if exc_info is not None:
               traceback.print_exception(*exc_info)
 
+.. workaround a bug of vim syntax highlight*
+
 __ http://flask.readthedocs.org/en/latest/config/#configuring-from-files
 __ http://flask.readthedocs.org/en/latest/quickstart/#sessions
 
