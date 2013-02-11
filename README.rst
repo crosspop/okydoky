@@ -202,6 +202,11 @@ To be released.
 - Try recreating the virtualenv if the build has failed first.
 - Added ``--proxy-fix`` option for HTTP reverse proxies.
 - Added ``--force-https`` option.
+- Don't use github-distutils_ anymore to prevent several headaches related
+  packaging and distribution.
+
+.. _github-distutils: https://github.com/dahlia/github-distutils
+
 
 Version 0.9.5
 '''''''''''''
