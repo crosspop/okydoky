@@ -23,6 +23,8 @@ parser.add_option('-p', '--port', type='int', default=8080,
 parser.add_option('--proxy-fix', action='store_true', default=False,
                   help='forward X-Forwared-* headers to support HTTP '
                        'reverse proxies e.g. nginx, lighttpd')
+parser.add_option('--force-https', action='store_true', default=False,
+                  help='redirect all HTTP requests to HTTPS locations')
 parser.add_option('-d', '--debug', action='store_true',
                   help='debug mode')
 parser.add_option('-q', '--quiet', action='store_const', const=logging.ERROR,
@@ -50,9 +52,33 @@ def main(*args, **kwargs):
     for conf in REQUIRED_CONFIGS:
         if conf not in app.config:
             parser.error('missing config: ' + conf)
+    if options.force_https:
+        app.wsgi_app = ForcingHTTPSMiddleware(app.wsgi_app)
     if options.proxy_fix:
         app.wsgi_app = ProxyFix(app.wsgi_app)
     server(listen((options.host, options.port)), app)
+
+
+class ForcingHTTPSMiddleware(object):
+    """It redirects all non-HTTPS requests to HTTPS locations."""
+
+    def __init__(self, app):
+        self.app = app
+
+    def __call__(self, environ, start_response):
+        if environ['wsgi.url_scheme'] != 'https':
+            qs = environ.get('QUERY_STRING', '')
+            url = 'https://{0}{1}{2}'.format(
+                environ['HTTP_HOST'],
+                environ['PATH_INFO'],
+                qs and '?' + qs
+            )
+            start_response('301 Moved Permanently', [
+                ('Location', url),
+                ('Content-Type', 'text/plain; charset=utf-8')
+            ])
+            return ['Redirecting to ', url, '...']
+        return self.app(environ, start_response)
 
 
 if __name__ == '__main__':

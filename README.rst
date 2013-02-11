@@ -201,6 +201,7 @@ To be released.
 - Added ``COMPLETE_HOOK`` option.
 - Try recreating the virtualenv if the build has failed first.
 - Added ``--proxy-fix`` option for HTTP reverse proxies.
+- Added ``--force-https`` option.
 
 Version 0.9.5
 '''''''''''''
