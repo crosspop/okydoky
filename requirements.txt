@@ -2,3 +2,4 @@ virtualenv
 iso8601
 Flask == 0.9
 eventlet
+Werkzeug

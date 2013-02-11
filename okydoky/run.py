@@ -10,6 +10,7 @@ import os.path
 
 from eventlet import listen
 from eventlet.wsgi import server
+from werkzeug.contrib.fixers import ProxyFix
 
 from .app import REQUIRED_CONFIGS, app
 
@@ -19,6 +20,9 @@ parser.add_option('-H', '--host', default='0.0.0.0',
                   help='hostname to listen [%default]')
 parser.add_option('-p', '--port', type='int', default=8080,
                   help='port to listen [%default]')
+parser.add_option('--proxy-fix', action='store_true', default=False,
+                  help='forward X-Forwared-* headers to support HTTP '
+                       'reverse proxies e.g. nginx, lighttpd')
 parser.add_option('-d', '--debug', action='store_true',
                   help='debug mode')
 parser.add_option('-q', '--quiet', action='store_const', const=logging.ERROR,
@@ -46,6 +50,8 @@ def main(*args, **kwargs):
     for conf in REQUIRED_CONFIGS:
         if conf not in app.config:
             parser.error('missing config: ' + conf)
+    if options.proxy_fix:
+        app.wsgi_app = ProxyFix(app.wsgi_app)
     server(listen((options.host, options.port)), app)
 
 
