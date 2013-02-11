@@ -194,7 +194,7 @@ Changelog
 Version 0.9.6
 '''''''''''''
 
-To be released.
+Released on February 12, 2013.
 
 - Added ``RECREATE_VIRTUALENV`` option which makes it to create
   the virtualenv for each build.
