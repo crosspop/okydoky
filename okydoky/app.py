@@ -298,7 +298,7 @@ def download_archive(commit, token, config):
     filename = os.path.join(config['SAVE_DIRECTORY'], commit + '.tar.gz')
     logger.debug('save %s into %s', commit, filename)
     logger.debug('filesize of %s: %s',
-                 filename, response.info()['Content-Length'])
+                 filename, response.info().get('Content-Length', 'none'))
     with open(filename, 'wb') as f:
         while 1:
             chunk = response.read(4096)
