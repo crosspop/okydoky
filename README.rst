@@ -191,6 +191,17 @@ __ https://github.com/crosspop/okydoky
 Changelog
 ---------
 
+Version 0.9.7
+'''''''''''''
+
+To be released.
+
+- A quick fix of hiding of some private repositories when there are many
+  repositories in the organization.  [`#7`_ by Jökull Sólberg Auðunsson]
+
+.. _#7: https://github.com/crosspop/okydoky/pull/7
+
+
 Version 0.9.6
 '''''''''''''
 
