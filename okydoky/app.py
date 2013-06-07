@@ -97,7 +97,7 @@ def ensure_login():
         repo_name = current_app.config['REPOSITORY']
         # user repos
         response = urllib2.urlopen(
-            'https://api.github.com/user/repos?access_token=' +
+            'https://api.github.com/user/repos?per_page=100&access_token=' +
             login
         )
         repo_dicts = json.load(response)
@@ -107,7 +107,7 @@ def ensure_login():
         auth = repo_name in repos
         # org repos
         if not auth:
-            url = 'https://api.github.com/orgs/{0}/repos?access_token={1}'
+            url = 'https://api.github.com/orgs/{0}/repos?per_page=100&access_token={1}'
             try:
                 response = urllib2.urlopen(
                     url.format(repo_name.split('/', 1)[0], login)
