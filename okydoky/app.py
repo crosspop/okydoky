@@ -10,6 +10,7 @@ import hmac
 import logging
 import os
 import os.path
+import pkg_resources
 import re
 import shutil
 import subprocess
@@ -24,7 +25,7 @@ from flask import (Flask, abort, current_app, json, make_response, redirect,
                    request, render_template, session, url_for)
 from flask.helpers import send_from_directory
 from iso8601 import parse_date
-from virtualenv import create_environment
+from virtualenv import create_environment, virtualenv_version
 from werkzeug.urls import url_decode, url_encode
 
 
@@ -367,6 +368,10 @@ def make_virtualenv(config, recreate=False):
         logger.info('virtualenv already exists: %s; remove...' % envdir)
         shutil.rmtree(envdir)
     logger.info('creating new virtualenv: %s' % envdir)
-    create_environment(envdir, use_distribute=True)
+    if (pkg_resources.parse_version(virtualenv_version) <
+            pkg_resources.parse_version('1.10.1')):
+        create_environment(envdir, use_distribute=True)
+    else:
+        create_environment(envdir)
     logger.info('created virtualenv: %s' % envdir)
     return envdir
