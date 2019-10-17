@@ -1,5 +1,5 @@
 virtualenv
 iso8601
-Flask == 0.9
+Flask == 1.0
 eventlet
 Werkzeug
